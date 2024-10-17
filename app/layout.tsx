@@ -1,5 +1,5 @@
 //Do not remove the comments
-//location of this file reactwallet/app/api/StellarBallance/layout.ts
+//location of this file reactwallet/app/api/layout.ts
 
 
 import { NextResponse } from 'next/server';

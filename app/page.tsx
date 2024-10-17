@@ -1,5 +1,5 @@
 //Do not remove the comments
-//location of this file reactwallet/app/api/StellarBallance/page.ts
+//location of this file reactwallet/app/api/page.ts
 
 import WalletBalance from '../components/WalletBalance';
 
