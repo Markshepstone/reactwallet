@@ -1,11 +1,11 @@
 //Do not remove the comments
-//location of this file reactwallet/components/WalletBalance.tsx
+//location of this file reactwallet/components/WalletManager.tsx
 
 'use client';
 
 import React, { useState } from 'react';
 
-const WalletBalance: React.FC = () => {
+const WalletManager: React.FC = () => {
   const [address, setAddress] = useState('');
   const [balance, setBalance] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +15,7 @@ const WalletBalance: React.FC = () => {
 
   const checkBalance = async () => {
     try {
-      const response = await fetch(`/api/stellarBalance?address=${encodeURIComponent(address)}`);
+      const response = await fetch(`/api/walletInfo?address=${encodeURIComponent(address)}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -121,4 +121,4 @@ const WalletBalance: React.FC = () => {
   );
 };
 
-export default WalletBalance;
+export default WalletManager;

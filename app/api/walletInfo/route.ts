@@ -1,5 +1,5 @@
 //Do not remove the comments
-//location of this file reactwallet/app/api/StellarBallance/route.ts
+//location of this file reactwallet/app/api/walletInfo/route.ts
 
 
 import { NextResponse } from 'next/server';
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ balance: '0' });
     }
   } catch (error) {
-    console.error('Error fetching Stellar balance:', error);
-    return NextResponse.json({ error: 'Error fetching balance: ' + (error as Error).message }, { status: 500 });
+    console.error('Error fetching walletInfo:', error);
+    return NextResponse.json({ error: 'Error wallet Info: ' + (error as Error).message }, { status: 500 });
   }
 }
