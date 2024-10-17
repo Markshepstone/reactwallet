@@ -1,12 +1,7 @@
-//Do not remove the comments
-//location of this file reactwallet/app/api/walletInfo/route.ts
-
+// File: reactwallet/app/api/walletInfo/route.ts
 
 import { NextResponse } from 'next/server';
-import pkg from 'stellar-sdk';
-
-const { Horizon } = pkg;
-const { Server } = Horizon;
+import StellarSdk from 'stellar-sdk';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -17,7 +12,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const server = new Server('https://horizon.stellar.org');
+    const server = new StellarSdk.Horizon.Server('https://horizon.stellar.org');
     const account = await server.loadAccount(address);
     const balances = account.balances.filter((b: any) => b.asset_type === 'native');
     
@@ -27,7 +22,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ balance: '0' });
     }
   } catch (error) {
-    console.error('Error fetching walletInfo:', error);
-    return NextResponse.json({ error: 'Error wallet Info: ' + (error as Error).message }, { status: 500 });
+    console.error('Error fetching Stellar wallet info:', error);
+    return NextResponse.json({ error: 'Error fetching wallet info: ' + (error as Error).message }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import PaymentForm from './PaymentForm';
 
 interface Wallet {
   publicKey: string;
@@ -208,6 +209,12 @@ const WalletList: React.FC = () => {
           )}
         </div>
       ))}
+
+
+      <PaymentForm wallets={wallets} />
+
+
+
       <div className="mt-8">
         <h3 className="text-xl font-bold mb-2">Add New Wallet</h3>
         <input
