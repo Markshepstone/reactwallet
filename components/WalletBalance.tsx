@@ -11,6 +11,7 @@ const WalletBalance: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [secretKey, setSecretKey] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const checkBalance = async () => {
     try {
@@ -38,6 +39,7 @@ const WalletBalance: React.FC = () => {
         setPublicKey(data.publicKey);
         setSecretKey(data.secretKey);
         setError(null);
+        setSaveMessage(null);
       } else {
         throw new Error(data.error || 'Error creating wallet');
       }
@@ -45,6 +47,35 @@ const WalletBalance: React.FC = () => {
       setPublicKey(null);
       setSecretKey(null);
       setError('Error creating wallet. Please try again.');
+    }
+  };
+
+  const saveWallet = async () => {
+    if (!publicKey || !secretKey) {
+      setError('No wallet to save. Please create a wallet first.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/saveWallet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ publicKey, secretKey }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSaveMessage('Wallet saved successfully');
+        setError(null);
+      } else {
+        throw new Error(data.error || 'Error saving wallet');
+      }
+    } catch (err) {
+      setSaveMessage(null);
+      setError('Error saving wallet. Please try again.');
     }
   };
 
@@ -76,8 +107,15 @@ const WalletBalance: React.FC = () => {
           <p>Public Key: {publicKey}</p>
           <p>Secret Key: {secretKey}</p>
           <p className="text-red-500 mt-2">Warning: Store your secret key securely. Never share it with anyone.</p>
+          <button
+            onClick={saveWallet}
+            className="w-full p-2 mt-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          >
+            Save Wallet
+          </button>
         </div>
       )}
+      {saveMessage && <p className="mt-4 text-green-500">{saveMessage}</p>}
       {error && <p className="mt-4 text-red-500">{error}</p>}
     </div>
   );
