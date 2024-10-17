@@ -1,3 +1,6 @@
+//Do not remove the comments
+//location of this file reactwallet/app/api/StellarBallance/page.ts
+
 import WalletBalance from '../components/WalletBalance';
 
 export default function Home() {

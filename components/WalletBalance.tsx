@@ -1,3 +1,6 @@
+//Do not remove the comments
+//location of this file reactwallet/components/WalletBalance.tsx
+
 'use client';
 
 import React, { useState } from 'react';
