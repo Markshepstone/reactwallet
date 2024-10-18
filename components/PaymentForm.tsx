@@ -2,22 +2,39 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface Wallet {
   publicKey: string;
+  name: string;
 }
 
-interface PaymentFormProps {
-  wallets: Wallet[];
-}
-
-const PaymentForm: React.FC<PaymentFormProps> = ({ wallets }) => {
+const PaymentForm: React.FC = () => {
+  const [wallets, setWallets] = useState<Wallet[]>([]);
   const [fromWallet, setFromWallet] = useState('');
   const [toAddress, setToAddress] = useState('');
   const [amount, setAmount] = useState('');
+  const [memo, setMemo] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchWallets();
+  }, []);
+
+  const fetchWallets = async () => {
+    try {
+      const response = await fetch('/api/getWallets');
+      if (response.ok) {
+        const data = await response.json();
+        setWallets(data);
+      } else {
+        throw new Error('Failed to fetch wallets');
+      }
+    } catch (err) {
+      setError('Error fetching wallets. Please try again.');
+    }
+  };
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +42,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ wallets }) => {
     setSuccess(null);
 
     if (!fromWallet || !toAddress || !amount) {
-      setError('All fields are required');
+      setError('From wallet, to address, and amount are required');
       return;
     }
 
@@ -39,6 +56,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ wallets }) => {
           fromPublicKey: fromWallet,
           toAddress,
           amount,
+          memo,
         }),
       });
 
@@ -48,6 +66,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ wallets }) => {
         setSuccess(`Payment successful! Transaction hash: ${data.transactionHash}`);
         setToAddress('');
         setAmount('');
+        setMemo('');
       } else {
         throw new Error(data.error || 'Payment failed');
       }
@@ -70,7 +89,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ wallets }) => {
             <option value="">Select a wallet</option>
             {wallets.map((wallet) => (
               <option key={wallet.publicKey} value={wallet.publicKey}>
-                {wallet.publicKey}
+                {wallet.name} ({wallet.publicKey})
               </option>
             ))}
           </select>
@@ -94,6 +113,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ wallets }) => {
             className="w-full p-2 border rounded"
             placeholder="Enter amount to send"
             step="0.0000001"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2">Memo (optional):</label>
+          <input
+            type="text"
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Enter memo (required for some exchanges)"
+            maxLength={28}
           />
         </div>
         <button

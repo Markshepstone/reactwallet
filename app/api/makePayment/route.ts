@@ -7,7 +7,7 @@ import StellarSdk from 'stellar-sdk';
 
 export async function POST(request: Request) {
   try {
-    const { fromPublicKey, toAddress, amount } = await request.json();
+    const { fromPublicKey, toAddress, amount, memo } = await request.json();
     
     // Retrieve the secret key for the fromPublicKey
     const filePath = path.join(process.cwd(), 'wallets.json');
@@ -23,8 +23,6 @@ export async function POST(request: Request) {
     const server = new StellarSdk.Horizon.Server('https://horizon.stellar.org');
     const sourceKeys = StellarSdk.Keypair.fromSecret(wallet.secretKey);
 
-    let transaction;
-
     const sourceAccount = await server.loadAccount(sourceKeys.publicKey());
     
     // Check if destination account exists
@@ -39,10 +37,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // If we reach here, the account exists, so let's make the payment
-    transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
+    // If we reach here, the account exists and is active, so let's make the payment
+    let transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
       fee: StellarSdk.BASE_FEE,
-      networkPassphrase: StellarSdk.Networks.PUBLIC, // Use the public network
+      networkPassphrase: StellarSdk.Networks.PUBLIC,
     })
       .addOperation(
         StellarSdk.Operation.payment({
@@ -50,8 +48,14 @@ export async function POST(request: Request) {
           asset: StellarSdk.Asset.native(),
           amount: amount.toString(),
         }),
-      )
-      .addMemo(StellarSdk.Memo.text('Payment from wallet app'))
+      );
+
+    // Add memo if provided
+    if (memo) {
+      transaction = transaction.addMemo(StellarSdk.Memo.text(memo));
+    }
+
+    transaction = transaction
       .setTimeout(180)
       .build();
     

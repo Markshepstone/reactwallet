@@ -10,8 +10,8 @@ export async function GET() {
     const data = await fs.readFile(filePath, 'utf-8');
     const wallets = JSON.parse(data);
     
-    // Return only public keys for security
-    const safeWallets = wallets.map(({publicKey}: {publicKey: string}) => ({publicKey}));
+    // Return public keys and names, but not secret keys
+    const safeWallets = wallets.map(({publicKey, name}: {publicKey: string, name: string}) => ({publicKey, name}));
     
     return NextResponse.json(safeWallets);
   } catch (error) {
